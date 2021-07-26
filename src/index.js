@@ -6,18 +6,18 @@ const {
   readonly,
   shallowReadonly,
   effect,
+  ref,
+  shallowRef,
+  toRef,
+  toRefs,
 } = Vue
 
-const state = reactive({ name: 'xiaodu', age: 18, height: 1.88 })
 
+const state = reactive({ name: 'xiaodu', age: 18 })
 
-const arr = reactive([1, 2, 3, 4])
+const toRefName = toRef(state, 'name')
 
-effect(() => {
-  console.log('effect执行', arr[2])
-})
+const toRefState = toRefs(state)
 
-setTimeout(() => {
-  arr.length = 2
-  console.log(arr)
-}, 2000)
+console.log(toRefName)
+console.log(toRefState)

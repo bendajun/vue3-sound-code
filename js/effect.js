@@ -17,6 +17,7 @@ export const effect = (fn, options = {}) => {
   if (!options.lazy) { // effect默认会先执行一次，传了lazy就默认不执行
     return effect()
   }
+  return effect
 }
 
 
