@@ -10,14 +10,14 @@ const {
   shallowRef,
   toRef,
   toRefs,
+  computed,
 } = Vue
 
 
-const state = reactive({ name: 'xiaodu', age: 18 })
+const state = reactive({ age: 20 })
+const ages = computed(() => {
+  console.log('计算属性执行了')
+  return state.age * 2
+})
 
-const toRefName = toRef(state, 'name')
-
-const toRefState = toRefs(state)
-
-console.log(toRefName)
-console.log(toRefState)
+console.log(ages.value)

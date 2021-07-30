@@ -8,8 +8,9 @@ const targetMap = new WeakMap() // 注2
 
 /**
  * 此函数让effect变成响应式的effect，可以做到数据变化，重新执行
- * @param {*} fn 执行effect时传入的函数
- * @param {*} options 执行effect时传入的其他的额外选项
+ * @param {Function} fn 执行effect时传入的函数
+ * @param {Object} options 执行effect时传入的其他的额外选项
+ * @returns 响应式的effect或者是用户传入函数的返回值
  */
 export const effect = (fn, options = {}) => {
   const effect = createReactiveEffect(fn, options)
@@ -23,8 +24,8 @@ export const effect = (fn, options = {}) => {
 
 /**
  * 创建一个响应式的effect
- * @param {*} fn 执行effect时传入的函数
- * @param {*} options 执行effect时传入的其他的额外选项
+ * @param {Function} fn 执行effect时传入的函数
+ * @param {Object} options 执行effect时传入的其他的额外选项
  * @returns 响应式的effect
  */
 function createReactiveEffect(fn, options) {
@@ -42,6 +43,7 @@ function createReactiveEffect(fn, options) {
   }
   effect.id = effectId++ // 制作一个effect标识，用于区分effect
   effect._isEffect = true // 用于标识这个是响应式的effect
+  effect.computed = options.computed || false // 是否是计算属性的effect
   effect.raw = fn // 保留effect对应的原函数
   effect.options = options // 保留用户传入的属性
 
@@ -50,11 +52,12 @@ function createReactiveEffect(fn, options) {
 
 /**
  * 让对象中的属性收集当前它对应的effect,进行依赖收集
- * @param {*} target 原目标对象，如传入reactive时的那个对象
+ * @param {any} target 原目标对象，如传入reactive时的那个对象
  * @param {TrackOpTypes} type TrackOpTypes类型，这里为取值，GET
- * @param {*} key 取的那个属性值
+ * @param {String} key 取的那个属性名
  */
 export function track(target, type, key) { // 我们这里可以拿到当前的effect
+  console.log(activeEffect, 3456)
   if (!activeEffect) return // 如果取值的时候，没有activeEffect，说明此属性不用收集依赖，因为当前取值没在effec中进行取值操作
 
   let depsMap = targetMap.get(target)
@@ -74,11 +77,11 @@ export function track(target, type, key) { // 我们这里可以拿到当前的e
 
 /**
  * 调用proxy的set 新增或者修改对象属性的时候，调用对应的effect
- * @param {*} target 原目标对象，如传入reactive时的那个对象
+ * @param {any} target 原目标对象，如传入reactive时的那个对象
  * @param {TriggerOrTypes} type TriggerOrTypes 属性是新增还是修改
- * @param {*} key 属性名
- * @param {*} newValue 新的值
- * @param {*} oldValue 老的值
+ * @param {String} key 属性名
+ * @param {any} newValue 新的值
+ * @param {any} oldValue 老的值
  */
 export function trigger(target, type, key, newValue, oldValue) {
   const depsMap = targetMap.get(target)
@@ -88,6 +91,13 @@ export function trigger(target, type, key, newValue, oldValue) {
   const add = (effectsToAdd) => {
     if (effectsToAdd) {
       effectsToAdd.forEach(effect => effects.add(effect))
+    }
+  }
+  const run = (effect) => {
+    if (effect.options.scheduler) { // 如果是计算属性的effect则执行其scheduler()方法
+      effect.options.scheduler()
+    } else { // 如果是普通的effect则立即执行effect方法
+      effect()
     }
   }
 
@@ -116,7 +126,7 @@ export function trigger(target, type, key, newValue, oldValue) {
   }
 
   // 循环执行收集的effect
-  effects.forEach(effect => effect())
+  effects.forEach(run)
 }
 
 /**

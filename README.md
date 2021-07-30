@@ -19,6 +19,7 @@ const {
   shallowRef,
   toRef,
   toRefs,
+  computed,
 } = Vue
 
 ```

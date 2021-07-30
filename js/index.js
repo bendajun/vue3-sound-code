@@ -19,6 +19,10 @@ import {
   toRefs
 } from './toRef'
 
+import {
+  computed
+} from './computed'
+
 export default {
   reactive,
   shallowReactive,
@@ -29,4 +33,5 @@ export default {
   shallowRef,
   toRef,
   toRefs,
+  computed,
 }
