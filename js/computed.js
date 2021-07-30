@@ -36,6 +36,12 @@ class ComputedRefImpl {
       lazy: true, // const ages = computed(() => state.age * 2) 计算属性是不会立刻执行传入的函数的， 只有在访问ages.value的时候才会执行
       computed: true, // 标识是计算属性类型的effect
       scheduler: () => {
+        console.log('scheduler执行了')
+        /**
+         * 在scheduler函数中并没有执行计算属性的getter函数求取新值,而是将_dirty设置为false,
+         * 然后通知依赖计算属性的副作用函数进行更新, 当依赖计算属性的副作用函数收到通知的时候就会访问计算属性的get函数，
+         * 此时会根据_dirty值来确定是否需要重新计算。
+         */
         if (!this._dirty) {
           this._dirty = true
           trigger(this, TriggerOrTypes.SET, 'value')
@@ -50,6 +56,7 @@ class ComputedRefImpl {
       this._value = this.effect()
       this._dirty = false
     }
+    // 访问计算属性值的阶段会调用track函数进行依赖收集，此时收集的是访问计算属性值的副作用函数
     track(this, TrackOpTypes.GET, 'value')
     return this._value
   }
