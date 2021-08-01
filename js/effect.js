@@ -57,7 +57,6 @@ function createReactiveEffect(fn, options) {
  * @param {String} key 取的那个属性名
  */
 export function track(target, type, key) { // 我们这里可以拿到当前的effect
-  console.log(activeEffect, key, 3456)
   if (!activeEffect) return // 如果取值的时候，没有activeEffect，说明此属性不用收集依赖，因为当前取值没在effec中进行取值操作
 
   let depsMap = targetMap.get(target)
@@ -85,7 +84,6 @@ export function track(target, type, key) { // 我们这里可以拿到当前的e
  */
 export function trigger(target, type, key, newValue, oldValue) {
   const depsMap = targetMap.get(target)
-  console.log(key, depsMap, 1)
   if (!depsMap) return // 如果这个对象没有收集过effect，那么就不做任何操作
 
   const effects = new Set() // 将所有的需要执行的effect全部存到一个新的集合中，最终一起执行

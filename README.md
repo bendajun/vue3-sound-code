@@ -28,6 +28,7 @@ const {
   目前总共2个tag，以及一个master主分支
   * **reactive-effect** 版本1. 完成reactive shallowReactive readnoly shallowReadonly effect
   * **ref-toRef** 版本2. 完成ref toRef toRefs
+  * **computed** 版本3， 完成computed
 
 ## tips
   * 后续还会继续更新
